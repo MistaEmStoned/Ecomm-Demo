@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MicoMart - Checkout</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header>
+  <div class="logo-container">
+    <img src="https://img.icons8.com/external-icongeek26-outline-color-icongeek26/48/14694a/shopping-basket--v2.png" alt="MicoMart Logo" />
+    <h1>MicoMart</h1>
+  </div>
+  <nav>
+    <button id="navToggle" aria-label="Toggle menu">&#9776;</button>
+    <ul id="navMenu" class="hidden" aria-label="Primary navigation">
+      <li><a href="home.html">Home</a></li>
+      <li><a href="checkout.html">Checkout</a></li>
+      <li><a href="admin.html">Admin</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="checkout-page">
+  <h2>Checkout</h2>
+  <section class="checkout-cart">
+    <ul id="cartItems"></ul>
+    <div class="cart-footer">
+      <strong>Total: ₱<span id="cartTotal">0.00</span></strong>
+    </div>
+  </section>
+
+  <section class="checkout-form">
+    <h3>Shipping & Payment</h3>
+    <form id="checkoutForm">
+      <label>
+        Full Name:
+        <input type="text" name="name" required />
+      </label>
+      <label>
+        Address:
+        <input type="text" name="address" required />
+      </label>
+      <label>
+        Contact Number:
+        <input type="tel" name="phone" required />
+      </label>
+      <label>
+        Payment Method:
+        <select name="payment" required>
+          <option value="">Select</option>
+          <option value="cash">Cash on Delivery</option>
+          <option value="gcash">Gcash</option>
+        </select>
+      </label>
+      <button type="submit" class="btn-primary">Place Order</button>
+    </form>
+  </section>
+</main>
+
+<footer>
+  <p>© 2025 <strong>MicoMart</strong> — Made by Marco</p>
+</footer>
+
+<script src="script.js"></script>
+<script>
+document.getElementById('checkoutForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  alert('Order placed successfully!');
+  localStorage.removeItem('cart');
+  window.location.href = 'home.html';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "name": "Organic Green Big Capsicum",
+    "price": 24.00,
+    "image": "https://cdn-icons-png.flaticon.com/512/415/415733.png",
+    "weight": "1000gm",
+    "rating": 4.8,
+    "badge": "Frozen"
+  },
+  {
+    "id": 2,
+    "name": "Seoul Yopokki Spicy 4 flavors of Korean Topokki",
+    "price": 24.00,
+    "image": "https://cdn-icons-png.flaticon.com/512/1046/1046755.png",
+    "weight": "1000gm",
+    "rating": 4.8,
+    "badge": "Best Sale"
+  },
+  {
+    "id": 3,
+    "name": "Cavendish banana Malaysia",
+    "price": 0.40,
+    "image": "https://cdn-icons-png.flaticon.com/512/415/415731.png",
+    "weight": "1000gm",
+    "rating": 4.8,
+    "badge": null
+  },
+  {
+    "id": 4,
+    "name": "Tazaj Mart Full Cream Fresh Milk",
+    "price": 24.00,
+    "image": "https://cdn-icons-png.flaticon.com/512/415/415734.png",
+    "weight": "4pack",
+    "rating": 4.8,
+    "badge": null
+  }
+]
