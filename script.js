@@ -1,111 +1,191 @@
-const products = [
-  { id: 1, name: "Laptop", price: 500, image: "https://via.placeholder.com/220x150" },
-  { id: 2, name: "Headphones", price: 50, image: "https://via.placeholder.com/220x150" },
-  { id: 3, name: "Smartphone", price: 300, image: "https://via.placeholder.com/220x150" },
-  { id: 4, name: "Watch", price: 120, image: "https://via.placeholder.com/220x150" },
-  { id: 5, name: "Tablet", price: 250, image: "https://via.placeholder.com/220x150" },
-  { id: 6, name: "Keyboard", price: 30, image: "https://via.placeholder.com/220x150" },
-  { id: 7, name: "Mouse", price: 25, image: "https://via.placeholder.com/220x150" },
-  { id: 8, name: "Monitor", price: 200, image: "https://via.placeholder.com/220x150" },
-  { id: 9, name: "Printer", price: 150, image: "https://via.placeholder.com/220x150" },
-  { id: 10, name: "Camera", price: 400, image: "https://via.placeholder.com/220x150" },
-  { id: 11, name: "Speaker", price: 80, image: "https://via.placeholder.com/220x150" },
-  { id: 12, name: "Smartwatch", price: 150, image: "https://via.placeholder.com/220x150" },
-  { id: 13, name: "External HDD", price: 90, image: "https://via.placeholder.com/220x150" },
-  { id: 14, name: "USB Drive", price: 15, image: "https://via.placeholder.com/220x150" },
-  { id: 15, name: "Microphone", price: 60, image: "https://via.placeholder.com/220x150" },
-  { id: 16, name: "Webcam", price: 70, image: "https://via.placeholder.com/220x150" },
-  { id: 17, name: "Router", price: 100, image: "https://via.placeholder.com/220x150" },
-  { id: 18, name: "VR Headset", price: 350, image: "https://via.placeholder.com/220x150" },
-  { id: 19, name: "Projector", price: 450, image: "https://via.placeholder.com/220x150" },
-  { id: 20, name: "Gaming Chair", price: 250, image: "https://via.placeholder.com/220x150" }
-];
+// ELEMENT REFERENCES
+const navToggle = document.getElementById('navToggle');
+const navMenu = document.getElementById('navMenu');
+const cartToggle = document.getElementById('cartToggle');
+const cartPanel = document.getElementById('cartPanel');
+const closeCartBtn = document.getElementById('closeCartBtn');
+const productList = document.getElementById('productList');
+const searchInput = document.getElementById('searchInput');
+const cartItemsContainer = document.getElementById('cartItems');
+const cartTotalEl = document.getElementById('cartTotal');
+const checkoutBtn = document.getElementById('checkoutBtn');
+const headerCartCount = document.getElementById('headerCartCount');
 
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let products = [];
+let cart = JSON.parse(localStorage.getItem('cart')) || {};
 
+// ---------------- NAV TOGGLE (MOBILE ONLY)
+if (navToggle && navMenu) {
+  navToggle.addEventListener('click', () => {
+    navMenu.classList.toggle('visible');
+  });
+}
+
+// ---------------- CART TOGGLE
+if (cartToggle && cartPanel) {
+  cartToggle.addEventListener('click', () => {
+    cartPanel.classList.add('visible');
+    if (navMenu) navMenu.classList.remove('visible');
+  });
+}
+
+if (closeCartBtn && cartPanel) {
+  closeCartBtn.addEventListener('click', () => {
+    cartPanel.classList.remove('visible');
+  });
+}
+
+// ---------------- LOAD PRODUCTS
+fetch('products.json')
+  .then(res => res.json())
+  .then(data => {
+    products = data;
+    renderProducts(products);
+  })
+  .catch(() => {
+    if (productList) {
+      productList.innerHTML = '<p style="text-align:center; color:red;">Failed to load products.</p>';
+    }
+  });
+
+// ---------------- RENDER PRODUCTS
+function renderProducts(list) {
+  if (!productList) return;
+  productList.innerHTML = '';
+  if(list.length === 0){
+    productList.innerHTML = '<p style="grid-column:1/-1; text-align:center;">No products found.</p>';
+    return;
+  }
+
+  list.forEach(product => {
+    const productDiv = document.createElement('article');
+    productDiv.className = 'product';
+    productDiv.setAttribute('tabindex', '0');
+    productDiv.innerHTML = `
+      ${product.badge ? `<span class="badge ${product.badge.toLowerCase().replace(/\s/g, '-')}">${product.badge}</span>` : ''}
+      <img src="${product.image}" alt="${product.name}" width="100%" loading="lazy" />
+      <h3>${product.name}</h3>
+      ${product.weight ? `<p class="weight">${product.weight}</p>` : ''}
+      ${product.rating ? `<div class="rating" aria-label="Rating ${product.rating} out of 5 stars">${"⭐️".repeat(Math.floor(product.rating))} (${product.rating.toFixed(1)})</div>` : ''}
+      <div class="price">₱${product.price.toFixed(2)}</div>
+      <button class="add-btn" aria-label="Add ${product.name} to cart" data-id="${product.id}">+</button>
+    `;
+    productList.appendChild(productDiv);
+  });
+}
+
+// ---------------- ADD TO CART
+function addToCart(productId) {
+  const product = products.find(p => p.id === productId);
+  if (!product) return;
+  if (cart[productId]) cart[productId].qty++;
+  else cart[productId] = { ...product, qty: 1 };
+
+  updateCart();
+  saveCart();
+  showCartPanel();
+}
+
+// ---------------- RENDER CART
+function renderCart() {
+  if (!cartItemsContainer) return;
+  cartItemsContainer.innerHTML = '';
+  const cartEntries = Object.values(cart);
+
+  if(cartEntries.length === 0){
+    cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
+    if(cartTotalEl) cartTotalEl.textContent = '0.00';
+    toggleCartCount(0);
+    return;
+  }
+
+  let total = 0;
+  cartEntries.forEach(item => {
+    total += item.price * item.qty;
+    const li = document.createElement('li');
+    li.className = 'cart-item';
+    li.setAttribute('data-id', item.id);
+    li.innerHTML = `
+      <div>
+        <h4>${item.name}</h4>
+        <p>₱${item.price.toFixed(2)} × ${item.qty} = ₱${(item.price * item.qty).toFixed(2)}</p>
+      </div>
+      <div class="qty-controls" role="group" aria-label="Adjust quantity">
+        <button class="qty-btn decrease" aria-label="Decrease quantity">-</button>
+        <span aria-live="polite" aria-atomic="true">${item.qty}</span>
+        <button class="qty-btn increase" aria-label="Increase quantity">+</button>
+        <button class="qty-btn remove" aria-label="Remove item">&times;</button>
+      </div>
+    `;
+    cartItemsContainer.appendChild(li);
+
+    // Qty / Remove handlers
+    li.querySelector('.decrease')?.addEventListener('click', () => {
+      if (cart[item.id].qty > 1) cart[item.id].qty--;
+      else delete cart[item.id];
+      updateCart();
+      saveCart();
+    });
+    li.querySelector('.increase')?.addEventListener('click', () => {
+      cart[item.id].qty++;
+      updateCart();
+      saveCart();
+    });
+    li.querySelector('.remove')?.addEventListener('click', () => {
+      delete cart[item.id];
+      updateCart();
+      saveCart();
+    });
+  });
+
+  if(cartTotalEl) cartTotalEl.textContent = total.toFixed(2);
+  toggleCartCount(cartEntries.reduce((acc, i) => acc + i.qty, 0));
+}
+
+// ---------------- SAVE CART
 function saveCart() {
   localStorage.setItem('cart', JSON.stringify(cart));
 }
 
-function displayProducts() {
-  const container = document.getElementById('products');
-  container.innerHTML = '';
-  products.forEach(p => {
-    const card = document.createElement('div');
-    card.className = 'product-card';
-    card.innerHTML = `
-      <img src="${p.image}" alt="${p.name}">
-      <h4>${p.name}</h4>
-      <p>$${p.price}</p>
-      <button onclick="addToCart(${p.id})">Add to Cart</button>
-    `;
-    container.appendChild(card);
-  });
+// ---------------- SEARCH FILTER
+searchInput?.addEventListener('input', e => {
+  const query = e.target.value.trim().toLowerCase();
+  const filtered = products.filter(p => p.name.toLowerCase().includes(query));
+  renderProducts(filtered);
+});
+
+// ---------------- ADD BUTTONS EVENT (DELEGATION)
+productList?.addEventListener('click', e => {
+  if (e.target.classList.contains('add-btn')) {
+    const id = Number(e.target.getAttribute('data-id'));
+    addToCart(id);
+  }
+});
+
+// ---------------- CHECKOUT ALERT
+checkoutBtn?.addEventListener('click', () => {
+  alert('Checkout functionality coming soon!');
+});
+
+// ---------------- SHOW CART
+function showCartPanel() {
+  cartPanel?.classList.add('visible');
 }
 
-function addToCart(id) {
-  const product = products.find(p => p.id === id);
-  const item = cart.find(c => c.id === id);
-  if (item) item.qty += 1;
-  else cart.push({...product, qty: 1});
-  saveCart();
-  updateCart();
-}
-
-function removeFromCart(id) {
-  cart = cart.filter(item => item.id !== id);
-  saveCart();
-  updateCart();
-}
-
-function changeQty(id, delta) {
-  const item = cart.find(i => i.id === id);
-  if (!item) return;
-  item.qty += delta;
-  if (item.qty < 1) removeFromCart(id);
-  else {
-    saveCart();
-    updateCart();
+// ---------------- TOGGLE CART COUNT
+function toggleCartCount(count){
+  if (!headerCartCount) return;
+  if(count > 0){
+    headerCartCount.textContent = count;
+    headerCartCount.classList.remove('hidden');
+  } else {
+    headerCartCount.classList.add('hidden');
   }
 }
 
+// ---------------- INITIAL CART RENDER
 function updateCart() {
-  const cartItems = document.getElementById('cart-items');
-  const totalEl = document.getElementById('total');
-  cartItems.innerHTML = '';
-  let total = 0;
-  cart.forEach(item => {
-    total += item.price * item.qty;
-    const div = document.createElement('div');
-    div.className = 'cart-item';
-    div.innerHTML = `
-      <span>${item.name}</span>
-      <span class="qty-controls">
-        <button onclick="changeQty(${item.id}, -1)">-</button>
-        ${item.qty}
-        <button onclick="changeQty(${item.id}, 1)">+</button>
-      </span>
-      <span>$${(item.price * item.qty).toFixed(2)}</span>
-      <button onclick="removeFromCart(${item.id})">x</button>
-    `;
-    cartItems.appendChild(div);
-  });
-  totalEl.textContent = total.toFixed(2);
+  renderCart();
 }
 
-function checkout() {
-  if (cart.length === 0) {
-    alert("Cart is empty");
-    return;
-  }
-  alert("Checkout successful. Total: $" + cart.reduce((sum,i) => sum + i.price*i.qty,0).toFixed(2));
-  cart = [];
-  saveCart();
-  updateCart();
-}
-
-// Ensure everything loads after HTML is ready
-window.onload = function() {
-  displayProducts();
-  updateCart();
-};
+updateCart();
