@@ -1,24 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>E-commerce Demo</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MicoMart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<header>E-commerce Demo</header>
+<header>
+  <div class="logo-container">
+    <img src="https://img.icons8.com/external-icongeek26-outline-color-icongeek26/48/14694a/shopping-basket--v2.png" alt="MicoMart Logo" />
+    <h1>MicoMart</h1>
+  </div>
 
-<div class="container" id="products"></div>
+  <nav>
+    <button id="navToggle" aria-label="Toggle menu">&#9776;</button>
+    <ul id="navMenu" aria-label="Primary navigation">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="checkout.html">Checkout</a></li>
+      <li><a href="admin.html">Admin</a></li>
+    </ul>
+  </nav>
 
-<div class="cart" id="cart">
-  <h3>Your Cart</h3>
-  <div id="cart-items"></div>
-  <p>Total: $<span id="total">0</span></p>
-  <button class="checkout-btn" onclick="checkout()">Checkout</button>
-</div>
+  <button id="cartToggle" aria-label="Open cart" class="cart-btn">
+    🛒 <span id="headerCartCount" class="cart-count hidden">0</span>
+  </button>
+</header>
 
-<script src="script.js"></script>
+<section class="promo-banner" aria-label="Promotional banner">
+  <div class="promo-text">
+    <h2>Get <b>free delivery</b> on shopping ₱200</h2>
+    <p>Get the freshest groceries delivered right to your home. Save time and enjoy convenient delivery.</p>
+    <button class="btn-primary" id="bannerActionBtn">Learn More</button>
+  </div>
+  <div class="promo-image">
+    <img src="https://assets.codepen.io/4099456/shopping-basket.png" alt="Basket of fresh groceries" />
+  </div>
+</section>
+
+<section class="search-filter">
+  <input id="searchInput" type="search" placeholder="Search your products..." aria-label="Search products" autocomplete="off" />
+</section>
+
+<main>
+  <section id="productList" class="grid" aria-live="polite"></section>
+</main>
+
+<aside id="cartPanel" class="cart-panel hidden" aria-label="Shopping Cart" role="region" aria-live="polite">
+  <h2>Shopping Cart</h2>
+  <ul id="cartItems"></ul>
+  <div class="cart-footer">
+    <strong>Total: ₱<span id="cartTotal">0.00</span></strong>
+    <button id="checkoutBtn" class="btn-primary">Checkout</button>
+  </div>
+  <button id="closeCartBtn" aria-label="Close cart" class="cart-close">&times;</button>
+</aside>
+
+<footer>
+  <p>© 2025 <strong>MicoMart</strong> — Created by Marco</p>
+</footer>
+
+<script src="script.js" defer></script>
 </body>
-</html>
+        </html>
